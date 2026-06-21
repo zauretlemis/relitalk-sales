@@ -681,7 +681,24 @@ function renderTopDeal(rows){
       ${isRecordDay?`<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:#D1FAE5;color:#065F46;white-space:nowrap;flex-shrink:0;font-weight:600;">🏆 рекорд дня</span>`:''}
     </div>`:'';
 
-  document.getElementById('topDealEl').innerHTML=monthHtml+dayHtml+topMgrHtml||'<div style="font-size:12px;color:var(--text3);">Нет данных</div>';
+  // Рекорд дня — лучшая суммарная выручка за 1 день одним менеджером за всю историю
+  const allByMgrDay2={};
+  rows.forEach(r=>{
+    const key=r.manager+'|'+r.date;
+    if(!allByMgrDay2[key]) allByMgrDay2[key]={rev:0,manager:r.manager,date:r.date};
+    allByMgrDay2[key].rev+=r.revenue||0;
+  });
+  const bestDay=Object.values(allByMgrDay2).sort((a,b)=>b.rev-a.rev)[0];
+  const bestDayHtml=bestDay?`
+    <div class="card-title" style="margin-top:14px;">Рекорд дня</div>
+    <div class="deal-box">
+      <div class="deal-crown">⭐</div>
+      ${makeAv(bestDay.manager,'36px','11px')}
+      <div style="flex:1;"><div class="deal-amt">${fmt(bestDay.rev)}</div><div class="deal-meta">${bestDay.manager} · ${bestDay.date}</div></div>
+      <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:#FEF3C7;color:#92400E;white-space:nowrap;flex-shrink:0;font-weight:600;">рекорд</span>
+    </div>`:'';
+
+  document.getElementById('topDealEl').innerHTML=monthHtml+dayHtml+bestDayHtml||'<div style="font-size:12px;color:var(--text3);">Нет данных</div>';
 }
 
 function renderQuote(){
