@@ -644,10 +644,11 @@ function renderPodium(mgrList){
   const order=top3.length>=2?[top3[1],top3[0],top3[2]].filter(Boolean):top3;
   const pCls=['pb2','pb1','pb3'],avCls=['pav2','pav1','pav3'],medals=['🥈','🥇','🥉'],sizes=['48px','56px','44px'],fss=['13px','15px','12px'];
   document.getElementById('podiumEl').innerHTML=order.map((m,i)=>{
-    const origIdx=i===1?0:i===0?1:2;
-    const next=origIdx===0?null:origIdx===1?top3[0]:top3[1];
-    const isLeader=origIdx===0;
-    const gapHtml=isLeader?`<div class="p-gap gap-leader">Лидер 🏆</div>`:next?`<div class="p-gap gap-chase">до ${medals[origIdx-1]} ${fmtM(next.revenue-m.revenue)}</div>`:'';
+    // i=0→2е место, i=1→1е место, i=2→3е место
+    const isLeader=i===1;
+    const chaseTarget=i===0?top3[0]:i===2?top3[1]:null;
+    const chaseLabel=i===0?"🥇":i===2?"🥈":null;
+    const gapHtml=isLeader?`<div class="p-gap gap-leader">Лидер 🏆</div>`:chaseTarget?`<div class="p-gap gap-chase">до ${chaseLabel} ${fmtM(chaseTarget.revenue-m.revenue)}</div>`:'';
     return `<div class="p-col"><div class="p-av-wrap ${avCls[i]}">${makeAv(m.name,sizes[i],fss[i])}</div><div class="p-name">${m.name}</div><div class="p-rev">${fmtM(m.revenue)}</div>${gapHtml}<div class="p-block ${pCls[i]}">${medals[i]}</div></div>`;
   }).join('');
 }
