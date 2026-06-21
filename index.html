@@ -398,7 +398,10 @@ footer { border-top: 0.5px solid var(--border2); padding: 14px 20px; display: fl
         <button class="btn-apply" onclick="renderAnalytics()">Применить</button>
       </div>
       <div class="card" style="margin-bottom:14px;">
-        <div class="card-title">Динамика по дням</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+          <div class="card-title" style="margin:0;">Динамика по дням</div>
+          <div id="analyticsTotal" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;"></div>
+        </div>
         <div class="chart-wrap" style="height:220px;"><canvas id="chartDaily" role="img" aria-label="Выручка по дням"></canvas></div>
         <div style="display:flex;gap:16px;margin-top:8px;font-size:11px;color:var(--text3);">
           <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#10B981;display:inline-block;"></span>Лучший день</span>
@@ -760,6 +763,18 @@ function renderTable(mgrList){
 function renderAnalytics(){
   const rows=getAnalyticsRows();
   const activeRows=rows.filter(r=>!isExcluded(r.manager));
+  // Итого за период
+  const periodRev=rows.reduce((s,r)=>s+(r.revenue||0),0);
+  const periodSales=rows.filter(r=>r.hasSale).length;
+  const periodDays=new Set(rows.filter(r=>r.hasSale).map(r=>r.date)).size;
+  const el=document.getElementById('analyticsTotal');
+  if(el){el.innerHTML=`
+    <div style="display:flex;align-items:center;gap:6px;background:#EFF6FF;border-radius:8px;padding:6px 12px;">
+      <span style="font-size:11px;color:#64748B;">Итого за период:</span>
+      <span style="font-size:15px;font-weight:700;color:#2563EB;">${fmt(periodRev)}</span>
+    </div>
+    <div style="font-size:11px;color:var(--text3);">${periodSales} продаж · ${periodDays} дн.</div>
+  `;}
   const mgrs={};
   activeRows.forEach(r=>{if(!mgrs[r.manager]){mgrs[r.manager]={revenue:0,sales:0};}mgrs[r.manager].revenue+=r.revenue||0;if(r.hasSale)mgrs[r.manager].sales++;});
   const mgrList=Object.entries(mgrs).map(([n,d])=>({name:n,...d})).sort((a,b)=>b.revenue-a.revenue);
