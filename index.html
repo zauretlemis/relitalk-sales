@@ -601,6 +601,11 @@ function renderTrafficLight(rows){
   const byMgr={};
   todayRows.forEach(r=>{if(!byMgr[r.manager]){byMgr[r.manager]={sales:0,rev:0};}if(r.hasSale){byMgr[r.manager].sales++;byMgr[r.manager].rev+=r.revenue||0;}});
   const activeMgrs=[...new Set(allRows.filter(r=>!isExcluded(r.manager)).map(r=>r.manager))].sort();
+  const todayTotalRev=todayRows.reduce((s,r)=>s+(r.revenue||0),0);
+  const todayTotalSales=todayRows.filter(r=>r.hasSale).length;
+  const todaySummary=todayTotalSales>0
+    ? `<div style="margin-top:12px;padding-top:12px;border-top:0.5px solid var(--border2);display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text3);">Итого за сегодня</span><span style="font-size:14px;font-weight:700;color:var(--blue);">${fmt(todayTotalRev)}</span></div>`
+    : `<div style="margin-top:12px;padding-top:12px;border-top:0.5px solid var(--border2);text-align:center;font-size:12px;color:var(--text3);">Ждём первую продажу дня 🚀</div>`;
   document.getElementById('trafficLight').innerHTML=activeMgrs.map(m=>{
     const d=byMgr[m]||{sales:0,rev:0};const sold=d.sales>0;
     const stats=sold?`${d.sales} прод. · ${fmt(d.rev)}`:'нет продаж сегодня';
@@ -609,7 +614,7 @@ function renderTrafficLight(rows){
       <div class="tl-info"><div class="tl-name">${m}</div><div class="tl-stats">${stats}</div></div>
       <div class="tl-dot ${sold?'dot-g':'dot-r'}"></div>
     </div>`;
-  }).join('');
+  }).join('')+todaySummary;
 }
 
 function renderTopDeal(rows){
