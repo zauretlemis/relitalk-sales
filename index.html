@@ -654,19 +654,31 @@ function renderTopDeal(rows){
       ${avgCheck>0?`<span style="font-size:10px;color:var(--text3);white-space:nowrap;flex-shrink:0;">× ${(topDay.revenue/avgCheck).toFixed(1)} от среднего</span>`:''}
     </div>`:'<div style="font-size:12px;color:var(--text3);margin-top:10px;">Сегодня ещё нет сделок</div>';
 
-  // Топ менеджер дня по суммарной выручке
+  // Топ менеджер дня по суммарной выручке + проверка на рекорд дня
   const todayByMgr={};
   rows.filter(r=>r.date===today).forEach(r=>{
     if(!todayByMgr[r.manager]) todayByMgr[r.manager]=0;
     todayByMgr[r.manager]+=r.revenue||0;
   });
   const topMgrToday=Object.entries(todayByMgr).sort((a,b)=>b[1]-a[1])[0];
+
+  // Лучший день в истории (суммарная выручка за 1 день по 1 менеджеру)
+  const allByMgrDay={};
+  rows.forEach(r=>{
+    const key=r.manager+'|'+r.date;
+    if(!allByMgrDay[key]) allByMgrDay[key]=0;
+    allByMgrDay[key]+=r.revenue||0;
+  });
+  const bestEver=Math.max(...Object.values(allByMgrDay),0);
+  const isRecordDay=topMgrToday && topMgrToday[1]>=bestEver;
+
   const topMgrHtml=topMgrToday?`
     <div class="card-title" style="margin-top:14px;">Лучший менеджер дня</div>
     <div class="deal-box">
       <div class="deal-crown">⭐</div>
       ${makeAv(topMgrToday[0],'36px','11px')}
       <div style="flex:1;"><div class="deal-amt">${fmt(topMgrToday[1])}</div><div class="deal-meta">${topMgrToday[0]} · суммарно за день</div></div>
+      ${isRecordDay?`<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:#D1FAE5;color:#065F46;white-space:nowrap;flex-shrink:0;font-weight:600;">🏆 рекорд дня</span>`:''}
     </div>`:'';
 
   document.getElementById('topDealEl').innerHTML=monthHtml+dayHtml+topMgrHtml||'<div style="font-size:12px;color:var(--text3);">Нет данных</div>';
