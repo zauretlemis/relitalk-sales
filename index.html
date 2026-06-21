@@ -618,8 +618,35 @@ function renderTrafficLight(rows){
 }
 
 function renderTopDeal(rows){
-  const top=rows.filter(r=>r.hasSale).sort((a,b)=>b.revenue-a.revenue)[0];
-  document.getElementById('topDealEl').innerHTML=top?`<div class="deal-box"><div class="deal-crown">👑</div>${makeAv(top.manager,'36px','11px')}<div><div class="deal-amt">${fmt(top.revenue)}</div><div class="deal-meta">${top.manager} · ${top.date}</div></div></div>`:'<div style="font-size:12px;color:var(--text3);">Нет данных</div>';
+  const now=new Date();
+  const today=`${String(now.getDate()).padStart(2,'0')}.${String(now.getMonth()+1).padStart(2,'0')}.${now.getFullYear()}`;
+  
+  // Топ месяца
+  const topMonth=rows.filter(r=>r.hasSale).sort((a,b)=>b.revenue-a.revenue)[0];
+  // Топ дня
+  const topDay=rows.filter(r=>r.hasSale&&r.date===today).sort((a,b)=>b.revenue-a.revenue)[0];
+  // Средний чек
+  const sales=rows.filter(r=>r.hasSale);
+  const avgCheck=sales.length>0?sales.reduce((s,r)=>s+(r.revenue||0),0)/sales.length:0;
+
+  const monthHtml=topMonth?`
+    <div class="deal-box" style="margin-bottom:10px;">
+      <div class="deal-crown">👑</div>
+      ${makeAv(topMonth.manager,'36px','11px')}
+      <div style="flex:1;"><div class="deal-amt">${fmt(topMonth.revenue)}</div><div class="deal-meta">${topMonth.manager} · ${topMonth.date}</div></div>
+      <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:#FEF3C7;color:#92400E;white-space:nowrap;flex-shrink:0;">рекорд</span>
+    </div>`:'';
+
+  const dayHtml=topDay?`
+    <div class="card-title" style="margin-top:14px;">Топ сделка сегодня</div>
+    <div class="deal-box">
+      <div class="deal-crown">🔥</div>
+      ${makeAv(topDay.manager,'36px','11px')}
+      <div style="flex:1;"><div class="deal-amt">${fmt(topDay.revenue)}</div><div class="deal-meta">${topDay.manager} · сегодня</div></div>
+      ${avgCheck>0?`<span style="font-size:10px;color:var(--text3);white-space:nowrap;flex-shrink:0;">× ${(topDay.revenue/avgCheck).toFixed(1)} от среднего</span>`:''}
+    </div>`:'<div style="font-size:12px;color:var(--text3);margin-top:10px;">Сегодня ещё нет сделок</div>';
+
+  document.getElementById('topDealEl').innerHTML=monthHtml+dayHtml||'<div style="font-size:12px;color:var(--text3);">Нет данных</div>';
 }
 
 function renderQuote(){
