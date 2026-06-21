@@ -654,7 +654,22 @@ function renderTopDeal(rows){
       ${avgCheck>0?`<span style="font-size:10px;color:var(--text3);white-space:nowrap;flex-shrink:0;">× ${(topDay.revenue/avgCheck).toFixed(1)} от среднего</span>`:''}
     </div>`:'<div style="font-size:12px;color:var(--text3);margin-top:10px;">Сегодня ещё нет сделок</div>';
 
-  document.getElementById('topDealEl').innerHTML=monthHtml+dayHtml||'<div style="font-size:12px;color:var(--text3);">Нет данных</div>';
+  // Топ менеджер дня по суммарной выручке
+  const todayByMgr={};
+  rows.filter(r=>r.date===today).forEach(r=>{
+    if(!todayByMgr[r.manager]) todayByMgr[r.manager]=0;
+    todayByMgr[r.manager]+=r.revenue||0;
+  });
+  const topMgrToday=Object.entries(todayByMgr).sort((a,b)=>b[1]-a[1])[0];
+  const topMgrHtml=topMgrToday?`
+    <div class="card-title" style="margin-top:14px;">Лучший менеджер дня</div>
+    <div class="deal-box">
+      <div class="deal-crown">⭐</div>
+      ${makeAv(topMgrToday[0],'36px','11px')}
+      <div style="flex:1;"><div class="deal-amt">${fmt(topMgrToday[1])}</div><div class="deal-meta">${topMgrToday[0]} · суммарно за день</div></div>
+    </div>`:'';
+
+  document.getElementById('topDealEl').innerHTML=monthHtml+dayHtml+topMgrHtml||'<div style="font-size:12px;color:var(--text3);">Нет данных</div>';
 }
 
 function renderQuote(){
