@@ -648,13 +648,19 @@ function renderTopDeal(rows){
       <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:#FEF3C7;color:#92400E;white-space:nowrap;flex-shrink:0;">рекорд</span>
     </div>`:'';
 
+  // Все менеджеры с топовой сделкой дня
+  const todaySales=rows.filter(r=>r.hasSale&&r.date===today);
+  const topDayRev=topDay?topDay.revenue:0;
+  const topDayMgrs=todaySales.filter(r=>r.revenue===topDayRev);
+  const topDayAvatars=topDayMgrs.map(r=>makeAv(r.manager,'36px','11px')).join('');
+  const topDayNames=topDayMgrs.map(r=>r.manager).join(', ');
   const dayHtml=topDay?`
     <div class="card-title" style="margin-top:14px;">Топ сделка сегодня</div>
     <div class="deal-box">
       <div class="deal-crown">🔥</div>
-      ${makeAv(topDay.manager,'36px','11px')}
-      <div style="flex:1;"><div class="deal-amt">${fmt(topDay.revenue)}</div><div class="deal-meta">${topDay.manager} · сегодня</div></div>
-      ${avgCheck>0?`<span style="font-size:10px;color:var(--text3);white-space:nowrap;flex-shrink:0;">× ${(topDay.revenue/avgCheck).toFixed(1)} от среднего</span>`:''}
+      <div style="display:flex;gap:4px;flex-shrink:0;">${topDayAvatars}</div>
+      <div style="flex:1;"><div class="deal-amt">${fmt(topDayRev)}</div><div class="deal-meta">${topDayNames} · сегодня</div></div>
+      ${avgCheck>0?`<span style="font-size:10px;color:var(--text3);white-space:nowrap;flex-shrink:0;">× ${(topDayRev/avgCheck).toFixed(1)} от среднего</span>`:''}
     </div>`:'<div style="font-size:12px;color:var(--text3);margin-top:10px;">Сегодня ещё нет сделок</div>';
 
   // Топ менеджер дня по суммарной выручке + проверка на рекорд дня
