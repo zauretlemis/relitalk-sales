@@ -759,6 +759,10 @@ function renderStreak(){
   document.getElementById('streakList').innerHTML=mgrs.map(m=>{
     let streak=0;const check=new Date(now);
     const mDaysOff=DAYS_OFF[m]||[];
+    // Если сегодня ещё нет продаж у менеджера — начинаем считать со вчера
+    const todayDs=`${String(now.getDate()).padStart(2,'0')}.${String(now.getMonth()+1).padStart(2,'0')}.${now.getFullYear()}`;
+    const hasSaleToday=allRows.some(r=>r.manager===m&&r.date===todayDs&&r.hasSale);
+    if(!hasSaleToday) check.setDate(check.getDate()-1);
     for(let i=0;i<21;i++){
       const day=check.getDay();
       const ds=`${String(check.getDate()).padStart(2,'0')}.${String(check.getMonth()+1).padStart(2,'0')}.${check.getFullYear()}`;
