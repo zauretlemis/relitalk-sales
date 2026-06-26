@@ -709,7 +709,7 @@ function renderTopDeal(rows){
       <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:#FEF3C7;color:#92400E;white-space:nowrap;flex-shrink:0;font-weight:600;">рекорд</span>
     </div>`:'';
 
-  document.getElementById('topDealEl').innerHTML=monthHtml+dayHtml+bestDayHtml||'<div style="font-size:12px;color:var(--text3);">Нет данных</div>';
+  document.getElementById('topDealEl').innerHTML=monthHtml+bestDayHtml+dayHtml||'<div style="font-size:12px;color:var(--text3);">Нет данных</div>';
 }
 
 function renderQuote(){
