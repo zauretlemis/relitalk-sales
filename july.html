@@ -338,7 +338,7 @@ footer { border-top: 0.5px solid var(--border2); padding: 14px 20px; display: fl
           <div class="t-col"><div class="t-num" id="tS">--</div><div class="t-lbl">секунд</div></div>
         </div>
         <div class="timer-right">
-          <div class="timer-title">До конца июня</div>
+          <div class="timer-title">До конца июля</div>
           <div id="timerNeed"></div>
         </div>
       </div>
@@ -499,7 +499,7 @@ function switchTab(n,b){
 // TIMER
 function startTimer(){
   function tick(){
-    const now=new Date(),end=new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59);
+    const now=new Date(),end=new Date(now.getFullYear(),7,0,23,59,59);
     const diff=Math.max(0,end-now);
     const pad=n=>String(n).padStart(2,'0');
     document.getElementById('tD').textContent=Math.floor(diff/86400000);
@@ -542,8 +542,8 @@ function makeAv(name,size='28px',fs='9px'){
 }
 function isExcluded(name){return EXCLUDED.some(e=>name===e);}
 function juneRows(){
-  const now=new Date(),y=now.getFullYear(),m=String(now.getMonth()+1).padStart(2,'0');
-  return allRows.filter(r=>{const iso=toISO(r.date);return iso&&iso.startsWith(`${y}-${m}`);});
+  const y=new Date().getFullYear();
+  return allRows.filter(r=>{const iso=toISO(r.date);return iso&&iso.startsWith(`${y}-07`);});
 }
 function getAnalyticsRows(){
   const from=document.getElementById('dateFrom').value,to=document.getElementById('dateTo').value;
