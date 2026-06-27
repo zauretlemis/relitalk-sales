@@ -634,9 +634,9 @@ function renderTopDeal(rows){
   const now=new Date();
   const today=`${String(now.getDate()).padStart(2,'0')}.${String(now.getMonth()+1).padStart(2,'0')}.${now.getFullYear()}`;
   
-  // Топ месяца
-  const topMonth=rows.filter(r=>r.hasSale).sort((a,b)=>b.revenue-a.revenue)[0];
-  // Топ дня
+  // Топ за всё время (рекорд)
+  const topMonth=allRows.filter(r=>r.hasSale).sort((a,b)=>b.revenue-a.revenue)[0];
+  // Топ дня — только текущий месяц
   const topDay=rows.filter(r=>r.hasSale&&r.date===today).sort((a,b)=>b.revenue-a.revenue)[0];
   // Средний чек
   const sales=rows.filter(r=>r.hasSale);
@@ -694,7 +694,7 @@ function renderTopDeal(rows){
 
   // Рекорд дня — лучшая суммарная выручка за 1 день одним менеджером за всю историю
   const allByMgrDay2={};
-  rows.forEach(r=>{
+  allRows.forEach(r=>{
     const key=r.manager+'|'+r.date;
     if(!allByMgrDay2[key]) allByMgrDay2[key]={rev:0,manager:r.manager,date:r.date};
     allByMgrDay2[key].rev+=r.revenue||0;
