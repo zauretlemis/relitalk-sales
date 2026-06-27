@@ -444,9 +444,9 @@ footer { border-top: 0.5px solid var(--border2); padding: 14px 20px; display: fl
 <script>
 const PIN='4040';
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxLtfKNpytG3GBsgZ0qnTieVJ-6wq5AR3Cd6OpkRPpPYw_M33XEuumvRMf75JFMh-rF/exec';
-const TOTAL_PLAN=78_000_000;
-const MANAGER_PLANS={'Динара':13e6,'Игорь':13e6,'Максим':13e6,'Еркежан':13e6,'Бекзат':6.5e6,'Марат':6.5e6,'Мансур':6.5e6,'Сымбат':6.5e6};
-const EXCLUDED=['Лейли','Тимур','Динара С','Алия','Амина','Жулдыз','Султан','Зауре','Мария'];
+const TOTAL_PLAN=65_000_000;
+const MANAGER_PLANS={'Динара':13e6,'Игорь':13e6,'Еркежан':13e6,'Бекзат':6.5e6,'Марат':6.5e6,'Мансур':6.5e6,'Сымбат':6.5e6};
+const EXCLUDED=['Лейли','Тимур','Динара С','Алия','Амина','Жулдыз','Султан','Зауре','Мария','Максим'];
 // Выходные дни (0=вс,1=пн,2=вт,3=ср,4=чт,5=пт,6=сб)
 
 // Выходные (0=вс,1=пн,2=вт,3=ср,4=чт,5=пт,6=сб)
@@ -601,7 +601,7 @@ function renderAll(){
 function renderMetrics(totalRev,totalSales,avgCheck,uniqueDays){
   const pct=Math.min(totalRev/TOTAL_PLAN*100,100);
   document.getElementById('metricsRow').innerHTML=`
-    <div class="metric"><div class="m-lbl">Чистая выручка</div><div class="m-val blue">${fmtM(totalRev)}</div><div class="prog-bg"><div class="prog-fill" style="width:${pct.toFixed(1)}%"></div></div><div class="m-sub">${pct.toFixed(1)}% от плана 78 млн</div></div>
+    <div class="metric"><div class="m-lbl">Чистая выручка</div><div class="m-val blue">${fmtM(totalRev)}</div><div class="prog-bg"><div class="prog-fill" style="width:${pct.toFixed(1)}%"></div></div><div class="m-sub">${pct.toFixed(1)}% от плана 65 млн</div></div>
     <div class="metric"><div class="m-lbl">Продаж</div><div class="m-val green">${totalSales}</div><div class="m-sub">по ссылкам АМО</div></div>
     <div class="metric"><div class="m-lbl">Средний чек</div><div class="m-val purple">${fmt(avgCheck)}</div><div class="m-sub">чистая выручка</div></div>
     <div class="metric"><div class="m-lbl">Активных дней</div><div class="m-val amber">${uniqueDays}</div><div class="m-sub">с продажами</div></div>`;
@@ -719,8 +719,12 @@ function renderQuote(){
 
 function renderAlerts(rows,mgrList,mgrs){
   const now=new Date(),today=`${String(now.getDate()).padStart(2,'0')}.${String(now.getMonth()+1).padStart(2,'0')}.${now.getFullYear()}`;
-  const dLeft=new Date(now.getFullYear(),now.getMonth()+1,0).getDate()-now.getDate();
+  const isJuly=now.getMonth()===6; // 0-indexed, 6=July
+  const dLeft=new Date(now.getFullYear(),7,0).getDate()-now.getDate();
   const alerts=[];
+  // Не показываем уведомления пока июль не начался
+  if(!isJuly){alerts.push({dot:'ag',text:'Июль ещё не начался — ждём старта!',time:'скоро'});
+  document.getElementById('alertList').innerHTML=alerts.map(a=>`<div class="alert-item"><div class="a-dot ${a.dot}"></div><div><div class="a-text">${a.text}</div><div class="a-time">${a.time}</div></div></div>`).join('');return;}
   if(!rows.some(r=>r.date===today&&r.hasSale))alerts.push({dot:'ar',text:'Сегодня ещё нет продаж',time:'сегодня'});
   const top=rows.filter(r=>r.hasSale).sort((a,b)=>b.revenue-a.revenue)[0];
   if(top)alerts.push({dot:'ag',text:`Топ сделка: ${top.manager} · ${fmt(top.revenue)}`,time:top.date});
@@ -804,7 +808,7 @@ function renderStreak(){
 }
 
 function renderPlans(mgrs){
-  const order=['Динара','Игорь','Максим','Еркежан','Бекзат','Марат','Мансур','Сымбат'];
+  const order=['Динара','Игорь','Еркежан','Бекзат','Марат','Мансур','Сымбат'];
   document.getElementById('planList').innerHTML=order.map(name=>{
     const plan=MANAGER_PLANS[name];if(!plan)return'';
     const rev=(mgrs[name]||{}).revenue||0,pct=Math.min(rev/plan*100,100);
