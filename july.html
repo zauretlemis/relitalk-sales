@@ -574,7 +574,13 @@ function makeAv(name,size='28px',fs='9px'){
 function isExcluded(name){return EXCLUDED.some(e=>name===e);}
 function juneRows(){
   const y=new Date().getFullYear();
-  return allRows.filter(r=>{const iso=toISO(r.date);return iso&&iso.startsWith(`${y}-07`);});
+  return allRows.filter(r=>{
+    const iso=toISO(r.date);
+    if(!iso) return false;
+    // Разово: включаем 29 и 30 июня в июльский подсчёт
+    if(iso===`${y}-06-29`||iso===`${y}-06-30`) return true;
+    return iso.startsWith(`${y}-07`);
+  });
 }
 function getAnalyticsRows(){
   const from=document.getElementById('dateFrom').value,to=document.getElementById('dateTo').value;
